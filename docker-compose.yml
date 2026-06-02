@@ -13,7 +13,8 @@ services:
     environment:
       # WebSocket 模式：client (正向) 或 server (反向，默认)
       WS_MODE: "server"
-      # 反向模式监听端口
+      # 反向模式监听地址和端口
+      WS_HOST: "0.0.0.0"
       WS_PORT: "6700"
       WS_TOKEN: ""                    # 若设置了 access_token 填在这里
       BOT_NICK: "Reviewer"

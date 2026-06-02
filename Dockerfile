@@ -52,7 +52,8 @@ ENV WS_MODE="server"
 # 正向模式时：OneBot WebSocket 地址
 ENV WS_URL="ws://127.0.0.1:6700"
 
-# 反向模式时：监听端口
+# 反向模式时：监听地址和端口
+ENV WS_HOST="0.0.0.0"
 ENV WS_PORT="6700"
 
 # OneBot access_token（若未设置则留空）

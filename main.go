@@ -46,6 +46,7 @@ func main() {
 	wsMode := getEnv("WS_MODE", "server") // client (正向) 或 server (反向)
 	wsURL := getEnv("WS_URL", "ws://127.0.0.1:6700")
 	wsPort := getEnv("WS_PORT", "6700") // 反向 WS 监听端口
+	wsHost := getEnv("WS_HOST", "0.0.0.0") // 反向 WS 监听地址
 	wsToken := getEnv("WS_TOKEN", "")
 	botNick := getEnv("BOT_NICK", "Reviewer")
 	cmdPrefix := getEnv("CMD_PREFIX", "/")
@@ -71,8 +72,9 @@ func main() {
 		drivers = []zero.Driver{driver.NewWebSocketClient(wsURL, wsToken)}
 	default:
 		// 反向 WebSocket 服务端模式：等待 OneBot 客户端连接
-		log.Infof("[main] 模式: 反向 WS 服务端, 监听端口: %s", wsPort)
-		drivers = []zero.Driver{driver.NewWebSocketServer(":"+wsPort, wsToken)}
+		listenAddr := wsHost + ":" + wsPort
+		log.Infof("[main] 模式: 反向 WS 服务端, 监听地址: %s", listenAddr)
+		drivers = []zero.Driver{driver.NewWebSocketServer(1, listenAddr, wsToken)}
 	}
 	log.Infof("[main] 超级用户: %v", superUsers)
 
