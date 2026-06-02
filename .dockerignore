@@ -1,0 +1,29 @@
+# ── Git ──────────────────────────────────────
+.git
+.gitignore
+
+# ── 本地构建产物 ──────────────────────────────
+out/
+bin/
+*.exe
+
+# ── IDE / 编辑器 ──────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# ── 文档 / 说明（不需要进镜像）─────────────────
+README.md
+docs/
+
+# ── 测试文件 ──────────────────────────────────
+*_test.go
+testdata/
+
+# ── Docker 自身 ───────────────────────────────
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose*.yml
