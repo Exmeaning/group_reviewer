@@ -43,7 +43,9 @@ func main() {
 	}
 
 	// ── 从环境变量读取运行时配置（方便 Docker / docker-compose 注入）──
+	wsMode := getEnv("WS_MODE", "server") // client (正向) 或 server (反向)
 	wsURL := getEnv("WS_URL", "ws://127.0.0.1:6700")
+	wsPort := getEnv("WS_PORT", "6700") // 反向 WS 监听端口
 	wsToken := getEnv("WS_TOKEN", "")
 	botNick := getEnv("BOT_NICK", "Reviewer")
 	cmdPrefix := getEnv("CMD_PREFIX", "/")
@@ -60,16 +62,25 @@ func main() {
 		}
 	}
 
-	log.Infof("[main] 连接 OneBot 端点: %s", wsURL)
+	// ── 根据模式选择驱动 ──
+	var drivers []zero.Driver
+	switch strings.ToLower(wsMode) {
+	case "client":
+		// 正向 WebSocket 客户端模式：主动连接 OneBot 后端
+		log.Infof("[main] 模式: 正向 WS 客户端, 连接端点: %s", wsURL)
+		drivers = []zero.Driver{driver.NewWebSocketClient(wsURL, wsToken)}
+	default:
+		// 反向 WebSocket 服务端模式：等待 OneBot 客户端连接
+		log.Infof("[main] 模式: 反向 WS 服务端, 监听端口: %s", wsPort)
+		drivers = []zero.Driver{driver.NewWebSocketServer(":"+wsPort, wsToken)}
+	}
 	log.Infof("[main] 超级用户: %v", superUsers)
 
 	zero.RunAndBlock(&zero.Config{
 		NickName:      []string{botNick},
 		CommandPrefix: cmdPrefix,
 		SuperUsers:    superUsers,
-		Driver: []zero.Driver{
-			driver.NewWebSocketClient(wsURL, wsToken),
-		},
+		Driver:        drivers,
 	}, nil)
 }
 

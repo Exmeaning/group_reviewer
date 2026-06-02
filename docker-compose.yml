@@ -11,8 +11,10 @@ services:
     restart: unless-stopped
 
     environment:
-      # OneBot 正向 WS 地址（指向同网络内的 NapCat / go-cqhttp 容器名）
-      WS_URL: "ws://napcat:6700"
+      # WebSocket 模式：client (正向) 或 server (反向，默认)
+      WS_MODE: "server"
+      # 反向模式监听端口
+      WS_PORT: "6700"
       WS_TOKEN: ""                    # 若设置了 access_token 填在这里
       BOT_NICK: "Reviewer"
       CMD_PREFIX: "/"
@@ -20,16 +22,16 @@ services:
       TZ: "Asia/Shanghai"
       LOG_LEVEL: "info"
 
-    # 与 OneBot 后端同网络，通过容器名直接访问
+    # 反向 WS 端口：让 OneBot 客户端连接
+    ports:
+      - "6700:6700"
+
     networks:
       - bot-net
 
     # 挂载日志目录（可选）
     volumes:
       - ./logs:/app/logs
-
-    depends_on:
-      - napcat
 
     # 健康检查失败时自动重启
     healthcheck:
@@ -38,21 +40,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
-
-  # ── NapCat（OneBot11 后端示例，已有则删除此块）──────────────
-  napcat:
-    image: mlikiowa/napcat-docker:latest
-    container_name: napcat
-    restart: unless-stopped
-    environment:
-      NAPCAT_UID: "QQ账号"
-      # 更多 NapCat 配置见官方文档
-    volumes:
-      - ./napcat-data:/app/.config/QQ
-    ports:
-      - "6700:6700"   # 正向 WS，仅供宿主机调试；生产环境可去掉
-    networks:
-      - bot-net
 
 networks:
   bot-net:
