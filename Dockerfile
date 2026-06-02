@@ -56,6 +56,9 @@ ENV WS_URL="ws://127.0.0.1:6700"
 ENV WS_HOST="0.0.0.0"
 ENV WS_PORT="6700"
 
+# HTTP 健康检查端口（供 Zeabur/K8s 探测）
+ENV HTTP_PORT="8080"
+
 # OneBot access_token（若未设置则留空）
 ENV WS_TOKEN=""
 

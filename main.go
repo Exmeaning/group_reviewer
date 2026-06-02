@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -41,6 +42,19 @@ func main() {
 		fmt.Println("ok")
 		os.Exit(0)
 	}
+
+	// ── 启动 HTTP 健康检查服务（供 Zeabur/K8s 探测）────────────
+	httpPort := getEnv("HTTP_PORT", "8080")
+	go func() {
+		http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("ok"))
+		})
+		log.Infof("[main] HTTP 健康检查服务启动: :%s", httpPort)
+		if err := http.ListenAndServe(":"+httpPort, nil); err != nil {
+			log.Errorf("[main] HTTP 服务错误: %v", err)
+		}
+	}()
 
 	// ── 从环境变量读取运行时配置（方便 Docker / docker-compose 注入）──
 	wsMode := getEnv("WS_MODE", "server") // client (正向) 或 server (反向)
